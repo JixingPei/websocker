@@ -5,7 +5,6 @@
     <title>基于springboot的websocket</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://pv.sohu.com/cityjson?ie=utf-8"></script>
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
@@ -17,12 +16,20 @@
 
     <style>
             #showarea{
+
+                min-height: 350px;
+                max-height: 500px;
+                padding: 10px;
+            }
+            #showMes{
                 border:1px solid darkgrey;
                 border-radius:10px;
                 min-height: 350px;
-                max-height: 500px
+                max-height: 500px;
+                width: 100%;
                 padding: 10px;
             }
+
 
 
 
@@ -52,7 +59,7 @@
         <div class="col-sm-8">
             <!--消息列表展示区-->
             <div id="showarea">
-
+                <textarea id="showMes"></textarea>
             </div>
 
         </div>
@@ -72,14 +79,13 @@
         console.log("连接成功！");
     };
 
-    var ip = returnCitySN["cip"];
     document.getElementById("sendarea").onkeydown = function(event){
 　　　　var e  = event  ||  window.e;
 　　　　var keyCode = e.keyCode || e.which;
 　　　　switch(keyCode){
 　　　　case 13:
 　　　　　　submitmsg();
-　　　　　　break;　　　　
+            return false;
 　　      }　　
     }
 
@@ -96,11 +102,10 @@
                 username:username,
                 sendarea:sendarea,
                 time:new Date(),
-                ip:ip
             }
             //发送消息
             ws.send(JSON.stringify(jsonmsg));
-            document.getElementById("sendarea").value='';
+            document.getElementById("sendarea").value=null;
 
         }
 
@@ -113,10 +118,13 @@
         var jsonobj = eval(JSON.parse(evn.data));
 	    //往页面插入消息
         var msg = document.createElement("h4");
-        context = jsonobj.username+'&nbsp;&nbsp;' + '<br />'+jsonobj.sendarea
+        context = jsonobj.username+'\r\n'+jsonobj.sendarea+'\r\n';
         msg.innerHTML=context;
-        var showareadiv = document.getElementById("showarea");
-        showareadiv.appendChild(msg);
+<!--        var showareadiv = document.getElementById("showarea");-->
+<!--        showareadiv.appendChild(msg);-->
+        var showMes = document.getElementById("showMes");
+        showMes.value += context;
+
     };
 
     /**
@@ -144,6 +152,7 @@
 
         return num;
     }
+
 
 
 
