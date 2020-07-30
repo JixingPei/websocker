@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>这是一个聊天室</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <style>
+            #showarea{
+                border:1px solid darkgrey;
+                border-radius:10px;
+                min-height: 350px;
+                padding: 10px;
+            }
+        </style>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <br />
+        <div class="col-sm-4">
+            <div class="form-group">
+                <!--用户名-->
+                <input type="text" class="form-control" value="匿名" id="username">
+                <br />
+                <!--聊天内容-->
+                <textarea value="输入聊天内容" rows="10" class="form-control" id="sendarea"></textarea>
+                <br />
+                <!--提交按钮-->
+                <button class="btn btn-block btn-success" onclick="submitmsg()">发送</button>
+            </div>
+        </div>
+
+        <div class="col-sm-8">
+            <!--消息列表展示区-->
+            <div id="showarea">
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<script>
+    //当打开页面时新建WebSocket连接
+    var host = window.location.host;
+    var url = "ws://"+host+"/chat";//访问到后台项目注解所在的类
+    var ws = new WebSocket(url); //new一个新ws对象，new完即新建立一条“管道”
+
+	/**
+    *ws.onopen方法，当连接建立成功后触发
+    */
+    ws.onopen=function(){
+        onsole.log("连接成功！");
+    };
+
+    /**
+    *发送消息给服务器
+    */
+    function submitmsg() {
+            //获取用户名和要发送的消息
+            var username = document.getElementById("username").value;
+            var sendarea = document.getElementById("sendarea").value;
+            //转换为json字符串
+            var jsonmsg ={
+                username:username,
+                sendarea:sendarea,
+                time:new Date()
+            }
+            //发送消息
+            ws.send(JSON.stringify(jsonmsg));
+        }
+
+    /**
+    *从服务器接收消息
+    *ws.onmessage方法，当后台接受发送信息时触发
+    */
+	ws.onmessage = function(evn){
+        //转换为json字符串
+        var jsonobj = eval(JSON.parse(evn.data));
+	    //往页面插入消息
+        var msg = document.createElement("h4");
+        context = jsonobj.username+'&nbsp;&nbsp;'+getDate(jsonobj.time)+'<br />'+jsonobj.sendarea
+        msg.innerHTML=context;
+        var showareadiv = document.getElementById("showarea");
+        showareadiv.appendChild(msg);
+    };
+
+    /**
+    *ws.onclose方法，当窗口关闭，会话结束时触发
+    */
+    ws.onclose = function(){
+        onsole.log("关闭连接");
+    };
+
+    /*日期转换*/
+    function getDate(time){
+        var date = new Date(time);
+        Year = date.getFullYear();
+        Month = date.getMonth();
+        Day = date.getDay();
+        time = Year+"-"+getZero(Month)+"-"+getZero(Month);
+        return time;
+    }
+    /*日期补零*/
+    function getZero(num){
+
+        if(parseInt(num) < 10 ){
+        num = "0" + num;
+        }
+
+        return num;
+    }
+
+</script>
+
+</body>
+</html>
