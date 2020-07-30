@@ -60,6 +60,9 @@ public class WebSocketChatServer {
      *广播消息
      */
     public void broadcast(Set<WebSocketChatServer> sockets , String msg){
+        System.out.println(msg);
+
+
         //遍历当前所有的连接管道，将通知信息发送给每一个管道
         for(WebSocketChatServer socket : sockets){
             try {
